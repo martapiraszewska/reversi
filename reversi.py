@@ -107,4 +107,5 @@ def get_possible_moves(board, player):
     moves = [
         check_move(board, square, direction, player) for square in empty_squares_flatten for direction in directions]
     moves_without_none = [move for move in moves if move is not None]
-    return moves_without_none
+    moves_without_duplicates = list(set(moves_without_none))
+    return moves_without_duplicates
