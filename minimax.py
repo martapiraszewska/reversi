@@ -3,12 +3,6 @@ from heuristic import heuristic
 from reversi import get_possible_moves, is_gameover, get_winner, make_move
 
 
-def evaluation(board, ai_player):
-    # opponent = 'w' if ai_player == 'b' else 'b'
-    # return heuristic(board, ai_player) - heuristic(board, opponent)
-    return heuristic(board, ai_player)
-
-
 def minimax(curr_board, depth, alpha, beta, current_player, ai_player):
     if is_gameover(curr_board, current_player):
         winner = get_winner(curr_board)
@@ -16,9 +10,21 @@ def minimax(curr_board, depth, alpha, beta, current_player, ai_player):
             return 10000
         return -10000
     if depth == 0:
-        return evaluation(curr_board, ai_player)
+        return heuristic(curr_board, ai_player)
 
     moves = get_possible_moves(curr_board, current_player)
+    opponent = 'o' if current_player == 'x' else 'x'
+
+    if len(moves) == 0:
+        return minimax(
+            curr_board,
+            depth - 1,
+            alpha,
+            beta,
+            opponent,
+            ai_player
+        )
+
     if current_player == ai_player:
         max_eval = -math.inf
         max_eval = get_max_eval(curr_board, moves, max_eval, depth, alpha, beta, current_player, ai_player)
@@ -33,7 +39,7 @@ def minimax(curr_board, depth, alpha, beta, current_player, ai_player):
 def get_max_eval(curr_board, moves, max_eval, depth, alpha, beta, current_player, ai_player):
     if len(moves) == 0:
         return max_eval
-    new_curr_player = 'w' if current_player == 'b' else 'b'
+    new_curr_player = 'o' if current_player == 'x' else 'x'
     new_board = make_move(curr_board, moves[0], current_player)
     eval = minimax(new_board, depth - 1, alpha, beta, new_curr_player, ai_player)
     max_eval = max(max_eval, eval)
@@ -54,18 +60,25 @@ def get_min_eval(curr_board, moves, min_eval, depth, alpha, beta, current_player
     if beta <= alpha:
         return min_eval
     return get_min_eval(curr_board, moves[1:], min_eval, depth, alpha, beta, current_player, ai_player)
-    
 
-if __name__ == '__main__':
-    board = [
-        ['e', 'e', 'e', 'e', 'e', 'e', 'e', 'e'],
-        ['e', 'e', 'e', 'e', 'w', 'e', 'w', 'e'],
-        ['e', 'e', 'e', 'b', 'w', 'w', 'e', 'e'],
-        ['e', 'e', 'e', 'b', 'b', 'b', 'e', 'e'],
-        ['e', 'e', 'e', 'e', 'w', 'e', 'e', 'e'],
-        ['e', 'e', 'e', 'e', 'e', 'e', 'e', 'e'],
-        ['e', 'e', 'e', 'e', 'e', 'e', 'e', 'e'],
-        ['e', 'e', 'e', 'e', 'e', 'e', 'e', 'e'],
-    ]
-    val = minimax(board, 10, -math.inf, math.inf, 'b', 'b')
-    print(val)
+
+def best_minimax_move(board, depth, ai_player):
+    moves = get_possible_moves(board, ai_player)
+
+    return choose_move(board, moves, depth, ai_player, None, -math.inf)
+
+
+def choose_move(board, moves, depth, ai_player, best_move, best_eval):
+    if len(moves) == 0:
+        return best_move
+
+    move = moves[0]
+    opponent = 'o' if ai_player == 'x' else 'x'
+    new_board = make_move(board, move, ai_player)
+    value = minimax(new_board, depth - 1, -math.inf, math.inf, opponent, ai_player)
+
+    if value > best_eval:
+        best_eval = value
+        best_move = move
+
+    return choose_move(board, moves[1:], depth, ai_player, best_move, best_eval)
