@@ -1,9 +1,9 @@
 def get_starting_piece(i, j):
     if (i == 3 and j == 3) or (i == 4 and j == 4):
-        return 'b'
+        return 'x'
     elif (i == 3 and j == 4) or (i == 4 and j == 3):
-        return 'w'
-    return 'e'
+        return 'o'
+    return ' '
 
 
 def generate_start_board():
@@ -14,9 +14,8 @@ def generate_start_board():
 
 def get_start_state():
     board = generate_start_board()
-    curr_player = 'b'
-    consecutive_passes = 0
-    state = (board, curr_player, consecutive_passes)
+    curr_player = 'x'
+    state = (board, curr_player)
     return state
 
 
@@ -32,7 +31,7 @@ def check_direction(board, cell, direction, player):
     if is_outside(next_cell):
         return None
     x, y = next_cell
-    if board[x][y] == 'e':
+    if board[x][y] == ' ':
         return None
     elif board[x][y] != player:
         end_cell = check_direction(board, next_cell, direction, player)
@@ -66,11 +65,11 @@ def get_flips_in_direction(direction, board, move_cell, player):
 def update_cell(pieces_to_flip, cell, cell_state, player):
     if cell not in pieces_to_flip:
         return cell_state
-    if cell_state == 'e':
+    if cell_state == ' ':
         return player
-    elif cell_state == 'b':
-        return 'w'
-    return 'b'
+    elif cell_state == 'x':
+        return 'o'
+    return 'x'
 
 
 def generate_new_board(board, pieces_to_flip, player):
@@ -104,7 +103,7 @@ def check_move(board, move_cell, direction, player):
 
 
 def get_possible_moves(board, player):
-    empty_cells = [[(i, j) for j, col in enumerate(row) if col == 'e'] for i, row in enumerate(board)]
+    empty_cells = [[(i, j) for j, col in enumerate(row) if col == ' '] for i, row in enumerate(board)]
     empty_cells_flatten = [cell for row in empty_cells for cell in row]
     directions = [
         (-1, 0), (1, 0),    # up and down
@@ -120,14 +119,10 @@ def get_possible_moves(board, player):
 
 
 def update_state(state, move):
-    board, player, consecutive_passes = state
-    new_player = 'b' if player == 'w' else 'w'
-    if move is None:
-        new_consecutive_passes = consecutive_passes + 1
-    else:
-        new_consecutive_passes = 0
+    board, player = state
+    new_player = 'x' if player == 'o' else 'o'
     new_board = board if move is None else make_move(board, move, player)
-    new_state = (new_board, new_player, new_consecutive_passes)
+    new_state = (new_board, new_player)
     return new_state
 
 
@@ -136,7 +131,7 @@ def is_gameover(board, player):
     if possible_moves:
         return False
     
-    opponent = 'w' if player == 'b' else 'b'
+    opponent = 'o' if player == 'x' else 'x'
     opponents_moves = get_possible_moves(board, opponent)
     if opponents_moves:
         return False
@@ -144,11 +139,11 @@ def is_gameover(board, player):
 
 
 def get_winner(board):
-    white_pieces = sum(row.count('w') for row in board)
-    black_pieces = sum(row.count('b') for row in board)
-    if white_pieces == black_pieces:
+    o_pieces = sum(row.count('o') for row in board)
+    x_pieces = sum(row.count('x') for row in board)
+    if o_pieces == x_pieces:
         return None
-    if white_pieces > black_pieces:
-        return "white"
+    if o_pieces > x_pieces:
+        return "o"
     else:
-        return "black"
+        return "x"

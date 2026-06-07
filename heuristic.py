@@ -11,6 +11,8 @@ WEIGHTS = [
 
 
 def get_weight(i, j, color, player):
+    if color == ' ':
+        return 0
     if color == player:
         return WEIGHTS[i][j]
     return -WEIGHTS[i][j]
