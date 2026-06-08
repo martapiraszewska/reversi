@@ -156,7 +156,3 @@ def game():
     state = get_start_state()
     players = (player_black, player_white)
     main_loop(state, players)
-
-
-if __name__ == "__main__":
-    game()
