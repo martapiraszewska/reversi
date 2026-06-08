@@ -97,13 +97,13 @@ def ai_player_easy(state):
 
 
 def ai_player_medium(state):
-    best_move = get_best_move(state, 4)
+    best_move = get_best_move(state, 3)
     print_ai_move(best_move)
     return best_move
 
 
 def ai_player_hard(state):
-    best_move = get_best_move(state, 6)
+    best_move = get_best_move(state, 4)
     print_ai_move(best_move)
     return best_move
 

@@ -50,7 +50,7 @@ def get_min_eval(state, moves, min_eval, depth, alpha, beta, ai_player):
     _ , curr_player = state
     if len(moves) == 0:
         return min_eval
-    new_curr_player = 'w' if curr_player == 'b' else 'b'
+    new_curr_player = 'x' if curr_player == 'o' else 'x'
     new_board = make_move(state, moves[0])
     new_state = (new_board, new_curr_player)
     eval = minimax(new_state, depth - 1, alpha, beta, ai_player)
