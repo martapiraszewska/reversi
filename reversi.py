@@ -26,7 +26,8 @@ def is_outside(cell):
     return False
 
 
-def check_direction(board, cell, direction, player):
+def check_direction(state, cell, direction):
+    board, player = state
     next_cell = tuple(map(lambda x, y: x + y, cell, direction))
     if is_outside(next_cell):
         return None
@@ -34,7 +35,7 @@ def check_direction(board, cell, direction, player):
     if board[x][y] == ' ':
         return None
     elif board[x][y] != player:
-        end_cell = check_direction(board, next_cell, direction, player)
+        end_cell = check_direction(state, next_cell, direction)
     else:
         return next_cell
     return end_cell
@@ -48,8 +49,8 @@ def map_sign(number):
     return 1
 
 
-def get_flips_in_direction(direction, board, move_cell, player):
-    end_cell = check_direction(board, move_cell, direction, player)
+def get_flips_in_direction(direction, state, move_cell):
+    end_cell = check_direction(state, move_cell, direction)
     if end_cell is not None:
         x, y = move_cell
         end_x, end_y = end_cell
@@ -72,29 +73,30 @@ def update_cell(pieces_to_flip, cell, cell_state, player):
     return 'x'
 
 
-def generate_new_board(board, pieces_to_flip, player):
+def generate_new_board(state, pieces_to_flip):
+    board, player = state
     new_board = [
         [update_cell(pieces_to_flip, (i, j), col, player) for j, col in enumerate(row)] for i, row in enumerate(board)]
     return new_board
 
 
-def make_move(board, move_cell, player):
+def make_move(state, move_cell):
     directions = [
         (-1, 0), (1, 0),    # up and down
         (0, -1), (0, 1),    # left and right
         (-1, -1), (-1, 1),   # diagonal
         (1, -1), (1, 1),
     ]
-    pieces_to_flip = [get_flips_in_direction(direction, board, move_cell, player) for direction in directions]
+    pieces_to_flip = [get_flips_in_direction(direction, state, move_cell) for direction in directions]
     flatten_pieces = [piece for row in pieces_to_flip for piece in row]
     all_pieces_to_flip = set(flatten_pieces + [move_cell])
-    new_board = generate_new_board(board, all_pieces_to_flip, player)
+    new_board = generate_new_board(state, all_pieces_to_flip)
     return new_board
 
 
-def check_move(board, move_cell, direction, player):
+def check_move(state, move_cell, direction):
     x, y = move_cell
-    end_cell = check_direction(board, move_cell, direction, player)
+    end_cell = check_direction(state, move_cell, direction)
     if end_cell is not None:
         end_x, end_y = end_cell
         if abs(x - end_x) > 1 or abs(y - end_y) > 1:
@@ -102,7 +104,8 @@ def check_move(board, move_cell, direction, player):
     return None
 
 
-def get_possible_moves(board, player):
+def get_possible_moves(state):
+    board, _ = state
     empty_cells = [[(i, j) for j, col in enumerate(row) if col == ' '] for i, row in enumerate(board)]
     empty_cells_flatten = [cell for row in empty_cells for cell in row]
     directions = [
@@ -112,7 +115,7 @@ def get_possible_moves(board, player):
         (1, -1), (1, 1),
     ]
     moves = [
-        check_move(board, cell, direction, player) for cell in empty_cells_flatten for direction in directions]
+        check_move(state, cell, direction) for cell in empty_cells_flatten for direction in directions]
     moves_without_none = [move for move in moves if move is not None]
     moves_without_duplicates = list(set(moves_without_none))
     return moves_without_duplicates
@@ -121,18 +124,20 @@ def get_possible_moves(board, player):
 def update_state(state, move):
     board, player = state
     new_player = 'x' if player == 'o' else 'o'
-    new_board = board if move is None else make_move(board, move, player)
+    new_board = board if move is None else make_move(state, move)
     new_state = (new_board, new_player)
     return new_state
 
 
-def is_gameover(board, player):
-    possible_moves = get_possible_moves(board,  player)
+def is_gameover(state):
+    board, player = state
+    possible_moves = get_possible_moves(state)
     if possible_moves:
         return False
     
     opponent = 'o' if player == 'x' else 'x'
-    opponents_moves = get_possible_moves(board, opponent)
+    new_state = (board, opponent)
+    opponents_moves = get_possible_moves(new_state)
     if opponents_moves:
         return False
     return True

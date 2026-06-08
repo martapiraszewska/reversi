@@ -1,5 +1,5 @@
-from reversi import get_possible_moves, get_start_state, update_state, get_winner
-from minimax import best_minimax_move
+from reversi import get_possible_moves, get_start_state, update_state, get_winner, is_gameover
+from minimax import get_best_move
 import math
 
 
@@ -47,7 +47,7 @@ def print_game_over(winner):
     print("-" * 40)
 
 
-def print_possible_moves(possible_moves, player):
+def print_possible_moves(possible_moves):
     print("Possible moves: ", end='')
     for move in possible_moves:
         converted_move = convert_to_human_move(move)
@@ -70,41 +70,41 @@ def print_turn(player):
     print(f"Current player: {player}")
 
 
+def print_ai_move(move):
+    print(f"AI played {convert_to_human_move(move)}")
+
+
+def print_pass(player):
+    print(f"{player} has no legal moves and must pass.")
+
+
 def get_game_option():
     game_option = input("Choose option (1-5): ")
     return game_option
 
 
 def human_player(state):
-    board = state[0]
-    curr_player = state[1]
-    possible_moves = get_possible_moves(board, curr_player)
-    print_possible_moves(possible_moves, curr_player)
+    possible_moves = get_possible_moves(state)
+    print_possible_moves(possible_moves)
     move = move_input_loop(possible_moves)
     return move
 
 
 def ai_player_easy(state):
-    board = state[0]
-    ai_player = state[1]
-    best_move = best_minimax_move(board, 2, ai_player)
-    print(f"AI played {convert_to_human_move(best_move)}")
+    best_move = get_best_move(state, 2)
+    print_ai_move(best_move)
     return best_move  
 
 
 def ai_player_medium(state):
-    board = state[0]
-    ai_player = state[1]
-    best_move = best_minimax_move(board, 4, ai_player)
-    print(f"AI played {convert_to_human_move(best_move)}")
+    best_move = get_best_move(state, 4)
+    print_ai_move(best_move)
     return best_move
 
 
 def ai_player_hard(state):
-    board = state[0]
-    ai_player = state[1]
-    best_move = best_minimax_move(board, 6, ai_player)
-    print(f"AI played {convert_to_human_move(best_move)}")
+    best_move = get_best_move(state, 6)
+    print_ai_move(best_move)
     return best_move
 
 
@@ -112,15 +112,13 @@ def main_loop(state, players):
     board, curr_player = state
     print_turn(curr_player)
     print_board(board)
-    possible_moves = get_possible_moves(board, curr_player)
+    if is_gameover(state):
+        winner = get_winner(board)
+        print_game_over(winner)
+        return
+    possible_moves = get_possible_moves(state)
     if len(possible_moves) == 0:
-        print(f"{curr_player} has no legal moves and must pass.")
-        opponent = 'x' if curr_player == 'o' else 'o'
-        opponent_possible_moves = get_possible_moves(board, opponent)
-        if len(opponent_possible_moves) == 0:
-            winner = get_winner(board)
-            print_game_over(winner)
-            return
+        print_pass(curr_player)
         move = None
     else:
         player_fn = players[0] if curr_player == 'x' else players[1]
