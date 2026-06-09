@@ -1,93 +1,88 @@
-# PF_Reversi
+# Reversi
+Marta Piraszewska  
 
+## Opis projektu
+Celem projektu jest implementacja gry Reversi w paradygmacie programowania funkcyjnego. 
+  
+Gra działa w trybach gracz vs gracz oraz gracz vs AI w różnych poziomach trudności. 
+   
+Logika gry obejmie generowanie planszy, wyznaczanie możliwych ruchów zgodnie z zasadami gry, wykonywanie ruchów wraz z odwracaniem pionków przeciwnika oraz sprawdzanie, kiedy gra powinna się zakończyć.  
+  
+Interfejs użytkownika jest zrealizowany w postaci terminalowej (CLI).  
+  
+Dodatkowo zaimplementowany jest moduł sztucznej inteligencji oparty na algorytmie Minimax z przycinaniem alfa-beta, który pozwala na wybór najlepszego ruchu poprzez analizę możliwych przyszłych stanów gry.
 
+## Uruchomienie projektu 
+Instalacja zależności:  
+`make install`  
+Uruchomienie gry:  
+`make run`  
+Uruchomienie testów jednostkowych:  
+`make test`  
 
-## Getting started
+## Struktura projektu
+Projekt składa się z następujących modułów:
+- reversi.py - implementacja logiki gry,  
+- minimax.py - implementacja algorytmu Minimax,  
+- heuristic.py - funkcja oceny pozycji,  
+- console_game.py - interfejs terminalogy gry (CLI),  
+- minimax_evaluation.py - moduł do testowania skuteczności algorytmu Minimax,   
+- test_reversi.py - testy jednostkowe,  
+- main.py - punkt wejścia aplikacji uruchamiający grę i wybór trybu rozgrywki,  
+- minimax_experiments.ipynb - notebook do uruchamiania eksperymentów i porównywania skuteczności algorytmu Minimax dla różnych głębokości przeszukiwania poprzez symulację wielu gier przeciwko losowemu graczowi.
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+## Reprezentacja danych
+- state (stan gry) - reprezentowany jest jako krotka: (board, current_player):  
+    - board - tablica dwuwymiarowa 8 na 8, zawiera wartości ‘x’, ‘o’ i ‘ ’ (pole puste), które określają jaki pionek znajduje się na danym polu,  
+    - current_player - gracz, w danej chwili ma wykonać ruch, przyjmuje wartości ‘x’ albo ‘o’,  
+- WEIGHTS - macierz wag określająca strategiczną wartość poszczególnych pól planszy wykorzystywana w funkcji heurystycznej,  
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+## Moduły gry - lista głównych funkcji
 
-## Add your files
+### Logika gry - plik reversi.py
+- get_start_state() - zwraca początkowy stan gry w postaci krotki (board, player),  
+- generate_start_board() - tworzy planszę początkową,  
+- get_possible_moves(state) - zwraca listę wszystkich legalnych ruchów dla aktualnego gracza,  
+- make_move(state, move) - wykonuje ruch i zwraca nową planszę,  
+- update_state(state, move) - zwraca nowy stan gry po wykonaniu ruchu,  
+- is_gameover(state) - sprawdza, czy gra została zakończona (żaden z graczy nie ma legalnego ruchu),   
+- get_winner(board) - wyznacza zwycięzcę na podstawie liczby pionków na planszy.  
 
-* [Create](https://docs.gitlab.com/user/project/repository/web_editor/#create-a-file) or [upload](https://docs.gitlab.com/user/project/repository/web_editor/#upload-a-file) files
-* [Add files using the command line](https://docs.gitlab.com/topics/git/add_files/#add-files-to-a-git-repository) or push an existing Git repository with the following command:
+### Sztuczna inteligencja (algorytm minimax) - plik minimax.py
+- minimax(state, depth, alpha, beta, ai_player) - funkcja rekurencyjna, przeszukuje możliwe stany gry do zadanej głębokości, wybierając najlepszy wynik przy założeniu optymalnej gry obu graczy,  
+- get_best_move(board, depth, ai_player)- wybiera najlepszy możliwy ruch dla gracza ai, wykorzystując algorytm minimax do oceny wszystkich opcji.  
 
-```
-cd existing_repo
-git remote add origin https://gitlab-stud.elka.pw.edu.pl/mpirasze/pf_reversi.git
-git branch -M main
-git push -uf origin main
-```
+### Heurystyka - plik heuristic.py
+- heuristic(board, player, weights) - oblicza ocenę planszy dla wskazanego gracza na podstawie wag przypisanych poszczególnym polom. 
 
-## Integrate with your tools
+### Testowanie skuteczności algorytmu Minimax - plik minimax_evaluate.py
+- random_move(state) - zwraca losowy legalny ruch dla danego stanu gr,
+- simulate_games(depth, games, ai_player, wins=0, draws=0, losses=0) - uruchamia wiele symulacji i zlicza wyniki (wygrane AI, remisy, porażki).
 
-* [Set up project integrations](https://gitlab-stud.elka.pw.edu.pl/mpirasze/pf_reversi/-/settings/integrations)
+### Interfejs terminalowy (CLI) - plik console_game.py
+- print_board(board) - wyświetla aktualną planszę,  
+- convert_from_human_move(move) - przekształca ruch wpisany przez użytkownika (np. „3d”) na współrzędne planszy,  
+- convert_to_human_move(move) - zamienia współrzędne planszy na format czytelny dla użytkownika,  
+- human_player(state) -  pobiera i waliduje ruch gracza,  
+- ai_player_easy(state) - wykonuje ruch komputera na łatwym poziomie (Minimax, głębokość 2),  
+- ai_player_medium(state) - wykonuje ruch komputera na średnim poziomie (Minimax, głębokość 3),  
+- ai_player_hard(state) - wykonuje ruch komputera na trudnym poziomie (Minimax, głębokość 4),   
+- main_loop(state, players) -  główna pętla gry odpowiedzialna za wyświetlanie planszy, obsługę ruchów graczy oraz aktualizację stanu gry,   
+- game() - uruchamia grę, wyświetla menu i inicjalizuje wybrany tryb rozgrywki. 
 
-## Collaborate with your team
+## Algorytm sztucznej inteligencji (Minimax)
+Algorytm sztucznej inteligencji został zaimplementowany przy użyciu algorytmu Minimax z przycinaniem alfa-beta. Analizuje on możliwe przyszłe stany gry do zadanej głębokości i wybiera ruch prowadzący do najlepszego wyniku przy założeniu optymalnej gry obu graczy. Przycinanie alfa-beta pozwala pominąć część analizowanych stanów, co przyspiesza działanie algorytmu.  
+  
+Po osiągnięciu maksymalnej głębokości przeszukiwania wykorzystywana jest funkcja heurystyczna oceniająca planszę. Ocena opiera się na macierzy wag przypisanych do pól planszy - pola strategicznie korzystne mają wysokie wartości, a niekorzystne wartości ujemne. Funkcja heurystyczna sumuje wagi pionów gracza i odejmuje wagi pionów przeciwnika, zwracając pojedynczą wartość liczbową określającą jakość danej pozycji.  Dzięki temu algorytm preferuje ruchy prowadzące do zajmowania korzystnych pozycji.
+    
+Poprawność i skuteczność algorytmu została dodatkowo sprawdzona w notebooku minimax_experiments.ipynb, w którym przeprowadzono serię symulacji gier Minimax przeciwko losowemu graczowi. Dla 100 rozegranych partii algorytm osiągnął 89 zwycięstw, 3 remisy i 8 porażek przy głębokości przeszukiwania 2 oraz 92 zwycięstwa, 1 remis i 7 porażek przy głębokości 3 oraz 96 zwycięstw, 0 remisów i 4 porażki przy głębokości 4.  
 
-* [Invite team members and collaborators](https://docs.gitlab.com/user/project/members/)
-* [Create a new merge request](https://docs.gitlab.com/user/project/merge_requests/creating_merge_requests/)
-* [Automatically close issues from merge requests](https://docs.gitlab.com/user/project/issues/managing_issues/#closing-issues-automatically)
-* [Enable merge request approvals](https://docs.gitlab.com/user/project/merge_requests/approvals/)
-* [Set auto-merge](https://docs.gitlab.com/user/project/merge_requests/auto_merge/)
+## Interfejs terminalowy (CLI)
+Interfejs konsolowy umożliwia uruchomienie i prowadzenie gry w trybie tekstowym. Program na początku wyświetla menu, w którym użytkownik wybiera tryb gry (gracz vs gracz lub gracz vs AI w różnych poziomach trudności). Dane wejściowe od użytkownika ograniczają się do wyboru opcji z menu oraz wpisywania ruchów w formacie tekstowym (np. „3d”). Ruch jest następnie konwertowany na współrzędne planszy i weryfikowany względem listy dostępnych legalnych ruchów. Jeśli jest poprawny, zostaje wykonany, a stan gry zostaje zaktualizowany.  
+  
+Dane wyjściowe interfejsu to przede wszystkim aktualna plansza gry wyświetlana w czytelnej formie tekstowej, lista możliwych ruchów dla aktualnego gracza oraz komunikaty informujące o przebiegu gry, takie jak kto jest aktualnym graczem, wykonany ruch AI, brak dostępnych ruchów (pas) oraz wynik końcowy. Interfejs odpowiada również za obsługę zakończenia gry i wyświetlenie zwycięzcy lub informacji o remisie. 
 
-## Test and Deploy
-
-Use the built-in continuous integration in GitLab.
-
-* [Get started with GitLab CI/CD](https://docs.gitlab.com/ci/quick_start/)
-* [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/user/application_security/sast/)
-* [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/topics/autodevops/requirements/)
-* [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/user/clusters/agent/)
-* [Set up protected environments](https://docs.gitlab.com/ci/environments/protected_environments/)
-
-***
-
-# Editing this README
-
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
-
-## Suggestions for a good README
-
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
-
-## Name
-Choose a self-explaining name for your project.
-
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
-
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
-
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
-
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
-
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
-
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
-
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
-
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
-
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
-
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
-
-## License
-For open source projects, say how it is licensed.
-
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+## Zastosowanie programowania funkcyjnego
+Projekt został zaimplementowany w możliwie funkcyjnym stylu. Główna logika gry opiera się na funkcjach czystych, które nie modyfikują danych wejściowych i dla tych samych argumentów zwracają zawsze ten sam wynik. Stan gry przekazywany jest między funkcjami jako argument, a każdy ruch tworzy nowy stan zamiast modyfikacji istniejącego. W wielu miejscach użyto rekurencji zamiast pętli.  
+  
+Elementy niezgodne z paradygmatem funkcyjnym dotyczą głównie interfejsu użytkownika, wykonują operacje wejścia/wyjścia, a więc posiadają efekty uboczne oraz modułu eksperymentów (minimax_evaluation.py), gdzie używana jest funkcja losowa (random_move) do symulacji przeciwnika. Wynika to z  praktycznych wymagań aplikacji konsolowej i potrzeby przeprowadzania testów i nie wpływa na funkcyjny charakter głównej logiki gry.
