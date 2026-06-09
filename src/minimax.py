@@ -1,5 +1,5 @@
 import math
-from heuristic import heuristic
+from heuristic import heuristic, WEIGHTS
 from reversi import get_possible_moves, is_gameover, get_winner, make_move
 
 
@@ -11,7 +11,7 @@ def minimax(state, depth, alpha, beta, ai_player):
             return 10000
         return -10000
     if depth == 0:
-        return heuristic(board, ai_player)
+        return heuristic(board, ai_player, WEIGHTS)
 
     moves = get_possible_moves(state)
     opponent = 'o' if curr_player == 'x' else 'x'
@@ -50,7 +50,7 @@ def get_min_eval(state, moves, min_eval, depth, alpha, beta, ai_player):
     _ , curr_player = state
     if len(moves) == 0:
         return min_eval
-    new_curr_player = 'x' if curr_player == 'o' else 'x'
+    new_curr_player = 'x' if curr_player == 'o' else 'o'
     new_board = make_move(state, moves[0])
     new_state = (new_board, new_curr_player)
     eval = minimax(new_state, depth - 1, alpha, beta, ai_player)

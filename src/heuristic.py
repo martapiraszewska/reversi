@@ -10,13 +10,13 @@ WEIGHTS = [
 ]
 
 
-def get_weight(i, j, color, player):
+def get_weight(i, j, color, player, weights):
     if color == ' ':
         return 0
     if color == player:
         return WEIGHTS[i][j]
     return -WEIGHTS[i][j]
 
-def heuristic(board, player):
-    score = sum(get_weight(i, j, col, player) for i, row in enumerate(board) for j, col in enumerate(row))
+def heuristic(board, player, weights):
+    score = sum(get_weight(i, j, col, player, weights) for i, row in enumerate(board) for j, col in enumerate(row))
     return score
