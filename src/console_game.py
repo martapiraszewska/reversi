@@ -123,8 +123,8 @@ def main_loop(state, players):
     else:
         player_fn = players[0] if curr_player == 'x' else players[1]
         move = player_fn(state)
-    state = update_state(state, move)
-    return main_loop(state, players)
+    new_state = update_state(state, move)
+    return main_loop(new_state, players)
 
 
 def move_input_loop(possible_moves):
@@ -140,19 +140,19 @@ def game():
     print_menu()
     game_option = get_game_option()
     if game_option == "1":
-        player_black = human_player
-        player_white = human_player
+        player_x = human_player
+        player_o = human_player
     elif game_option == "2":
-        player_black = human_player
-        player_white = ai_player_easy
+        player_x = human_player
+        player_o = ai_player_easy
     elif game_option == "3":
-        player_black = human_player
-        player_white = ai_player_medium
+        player_x = human_player
+        player_o = ai_player_medium
     elif game_option == "4":
-        player_black = human_player
-        player_white = ai_player_hard
+        player_x = human_player
+        player_o = ai_player_hard
     else:
         return
     state = get_start_state()
-    players = (player_black, player_white)
+    players = (player_x, player_o)
     main_loop(state, players)
